@@ -542,8 +542,136 @@ class ObservableArrayTests: XCTestCase {
             XCTAssertNil(error, "\(error)")
         }
     }
+    
+    func testReplaceAll() {
+        var a: ObservableArray<String> = ["foo", "bar"]
+        
+        a.replaceAll(withElements: ["buzz", "tea"])
+        XCTAssertEqual(["buzz", "tea"], a.elements)
+    }
+    
+    func testReplaceAllRxElements() {
+        var a: ObservableArray<String> = ["foo", "bar", "buzz"]
+        var observed = [[String]]()
+        
+        let exp = expectation(description: "event emitted")
+        a.rx_elements().subscribe { (eventObject) -> Void in
+            guard let elements = eventObject.element else { return XCTFail() }
+            observed.append(elements)
+            if observed.count == 2 {
+                exp.fulfill()
+            }
+        }
+        .addDisposableTo(disposeBag)
+        
+        a.replaceAll(withElements: ["milk", "coffee", "tea"])
+        
+        waitForExpectations(timeout: 1) { (error) in
+            XCTAssertNil(error, "\(error)")
+        }
+        
+        XCTAssertEqual(["milk", "coffee", "tea"], observed[1])
+    }
+    
+    func testReplaceAllRxEventSameCount() {
+        var a: ObservableArray<String> = ["foo", "bar", "buzz"]
+        
+        let exp = expectation(description: "event emitted")
+        a.rx_events().subscribe { (eventObject) -> Void in
+            guard let event = eventObject.element else { return XCTFail() }
+            XCTAssertTrue(event.insertedIndices.isEmpty)
+            XCTAssertTrue(event.deletedIndices.isEmpty)
+            XCTAssertEqual([0, 1, 2], event.updatedIndices)
+            exp.fulfill()
+        }
+        .addDisposableTo(disposeBag)
+        
+        a.replaceAll(withElements: ["milk", "coffee", "tea"])
+        
+        waitForExpectations(timeout: 1) { (error) in
+            XCTAssertNil(error, "\(error)")
+        }
+    }
+    
+    func testReplaceAllRxEventOldIsGreaterCount() {
+        var a: ObservableArray<String> = ["foo", "bar", "buzz", "lalala"]
+        
+        let exp = expectation(description: "event emitted")
+        a.rx_events().subscribe { (eventObject) -> Void in
+            guard let event = eventObject.element else { return XCTFail() }
+            XCTAssertTrue(event.insertedIndices.isEmpty)
+            XCTAssertEqual([3], event.deletedIndices)
+            XCTAssertEqual([0, 1, 2], event.updatedIndices)
+            exp.fulfill()
+            }
+            .addDisposableTo(disposeBag)
+        
+        a.replaceAll(withElements: ["milk", "coffee", "tea"])
+        
+        waitForExpectations(timeout: 1) { (error) in
+            XCTAssertNil(error, "\(error)")
+        }
+    }
+    
+    func testReplaceAllRxEventNewIsGreaterCount() {
+        var a: ObservableArray<String> = ["foo", "bar", "buzz"]
+        
+        let exp = expectation(description: "event emitted")
+        a.rx_events().subscribe { (eventObject) -> Void in
+            guard let event = eventObject.element else { return XCTFail() }
+            XCTAssertEqual([3], event.insertedIndices)
+            XCTAssertTrue(event.deletedIndices.isEmpty)
+            XCTAssertEqual([0, 1, 2], event.updatedIndices)
+            exp.fulfill()
+            }
+            .addDisposableTo(disposeBag)
+        
+        a.replaceAll(withElements: ["milk", "coffee", "tea", "lalala"])
+        
+        waitForExpectations(timeout: 1) { (error) in
+            XCTAssertNil(error, "\(error)")
+        }
+    }
 
-
+    func testReplaceAllRxEventNewIsEmpty() {
+        var a: ObservableArray<String> = ["foo", "bar", "buzz"]
+        
+        let exp = expectation(description: "event emitted")
+        a.rx_events().subscribe { (eventObject) -> Void in
+            guard let event = eventObject.element else { return XCTFail() }
+            XCTAssertTrue(event.insertedIndices.isEmpty)
+            XCTAssertEqual([0, 1, 2], event.deletedIndices)
+            XCTAssertTrue(event.updatedIndices.isEmpty)
+            exp.fulfill()
+            }
+            .addDisposableTo(disposeBag)
+        
+        a.replaceAll(withElements: [])
+        
+        waitForExpectations(timeout: 1) { (error) in
+            XCTAssertNil(error, "\(error)")
+        }
+    }
+    
+    func testReplaceAllRxEventOldIsEmpty() {
+        var a: ObservableArray<String> = []
+        
+        let exp = expectation(description: "event emitted")
+        a.rx_events().subscribe { (eventObject) -> Void in
+            guard let event = eventObject.element else { return XCTFail() }
+            XCTAssertEqual([0, 1, 2], event.insertedIndices)
+            XCTAssertTrue(event.deletedIndices.isEmpty)
+            XCTAssertTrue(event.updatedIndices.isEmpty)
+            exp.fulfill()
+            }
+            .addDisposableTo(disposeBag)
+        
+        a.replaceAll(withElements: ["milk", "coffee", "tea"])
+        
+        waitForExpectations(timeout: 1) { (error) in
+            XCTAssertNil(error, "\(error)")
+        }
+    }
 
     func testReplaceRange() {
         var a: ObservableArray<String> = ["foo", "bar"]

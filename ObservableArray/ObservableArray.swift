@@ -150,6 +150,22 @@ extension ObservableArray: MutableCollection {
         elements.insert(contentsOf: newElements, at: i)
         arrayDidChange(ArrayChangeEvent(inserted: Array(i..<i + newElements.count)))
     }
+    
+    public mutating func replaceAll(withElements newElements: [Element]) {
+        let oldCount = elements.count
+        elements.removeAll()
+        elements.append(contentsOf: newElements)
+        let newCount = elements.count
+        
+        let updated = Swift.min(newCount, oldCount)
+        let inserted = newCount - updated
+        let deleted = oldCount - updated
+        if updated + inserted + deleted > 0 {
+            arrayDidChange(ArrayChangeEvent(inserted: Array(updated..<updated + inserted),
+                                            deleted: Array(updated..<updated + deleted),
+                                            updated: Array(0..<updated)))
+        }
+    }
 
     public mutating func popLast() -> Element? {
         let e = elements.popLast()
