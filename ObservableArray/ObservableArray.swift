@@ -87,6 +87,10 @@ extension ObservableArray: Collection {
     public func index(after i: Int) -> Int {
         return elements.index(after: i)
     }
+
+    public func index(where block: (Element) throws -> Bool) -> Int? {
+        return elements.index(where: block)
+    }
 }
 
 extension ObservableArray: MutableCollection {
