@@ -137,6 +137,12 @@ extension ObservableArray: MutableCollection {
         arrayDidChange(ArrayChangeEvent(deleted: [index]))
         return e
     }
+    
+    public mutating func remove(at indices: [Int]) {
+        let sortedIndices: [Int] = indices.sorted().reversed()
+        sortedIndices.forEach { elements.remove(at: $0) }
+        arrayDidChange(ArrayChangeEvent(deleted: sortedIndices))
+    }
 
     public mutating func removeAll(_ keepCapacity: Bool = false) {
         guard !elements.isEmpty else {
