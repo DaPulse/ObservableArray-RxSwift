@@ -89,7 +89,7 @@ extension ObservableArray: Collection {
     }
 
     public func index(where block: (Element) throws -> Bool) -> Int? {
-        return elements.index(where: block)
+        return try? elements.index(where: block)
     }
 }
 
