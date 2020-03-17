@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "ObservableArray-RxSwift"
-  s.version      = "0.2"
+  s.version      = "0.3"
   s.summary      = "ObservableArray is an array that can emit messages of elements and diffs on it's changing."
   s.homepage     = "https://github.com/safx/ObservableArray-RxSwift"
   s.license      = { :type => "MIT", :file => "LICENSE" }
@@ -10,6 +10,6 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = "8.4"
   s.osx.deployment_target = "10.10"
   s.tvos.deployment_target = "9.0"
-  s.dependency     "RxSwift", '~> 4.0'
+  s.dependency     "RxSwift", '~> 5.1.0'
   s.requires_arc = true
 end
