@@ -72,9 +72,9 @@ extension ObservableArray: Collection {
         return elements.capacity
     }
 
-    /*public var count: Int {
+    public var count: Int {
         return elements.count
-    }*/
+    }
 
     public var startIndex: Int {
         return elements.startIndex
